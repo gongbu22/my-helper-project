@@ -1,6 +1,8 @@
 from fastapi import APIRouter, UploadFile, File
 import os
 from app.services.pdf_service import extract_text_from_pdf
+from app.services.text_splitter import split_text
+from app.services.vector_service import save_to_vector_db
 
 
 router = APIRouter()
@@ -17,6 +19,12 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     # 텍스트 추출
     text = extract_text_from_pdf(file_path)
+
+    # 텍스트 쪼개기
+    chunks = split_text(text)
+
+    # 벡터 DB 저장
+    save_to_vector_db(chunks)
 
     return {
         "filename": file.filename,
